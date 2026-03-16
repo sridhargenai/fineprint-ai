@@ -19,7 +19,7 @@ This project is split into two halves: A FastAPI Python Backend and a Next.js Re
 ### Prerequisites
 - Python 3.10+
 - Node.js v18+
-- An OpenAI API Key (Required for the AI Agent)
+- A Google Gemini API Key (Required for the AI Agent)
 
 ### 1. Start the Backend Agent (FastAPI)
 1. Navigate to the backend directory:
@@ -30,9 +30,10 @@ This project is split into two halves: A FastAPI Python Backend and a Next.js Re
    ```bash
    pip install -r requirements.txt
    ```
-3. Set your OpenAI API Key as an environment variable in your terminal:
-   - **Windows (PowerShell):** `set OPENAI_API_KEY=sk-your-api-key-here`
-   - **Mac/Linux:** `export OPENAI_API_KEY=sk-your-api-key-here`
+3. Create a `.env` file in the root of the backend directory and add your key:
+   ```bash
+   GEMINI_API_KEY=your-api-key-here
+   ```
 4. Run the Python server:
    ```bash
    python -m uvicorn main:app --reload
@@ -61,7 +62,7 @@ This project is split into two halves: A FastAPI Python Backend and a Next.js Re
 Once both servers are running, go to `http://localhost:3000`. 
 1. Drag and drop a sample PDF contract (Any PDF will work).
 2. Click **Initiate Audit**.
-3. **Important Note on the Demo:** If you do not have active OpenAI API credits, the application will automatically catch the `insufficient_quota` error and fall back to returning a perfect Mock Audit Data Response. This ensures the demo *always* succeeds for judging, correctly highlighting one compliant clause and one severe regulatory violation.
+3. **Important Note on the Demo:** If you do not have a valid Gemini API key or your quota is exceeded, the application will automatically catch the error (e.g. `api_key_missing` or `429`) and fall back to returning a perfect Mock Audit Data Response. This ensures the demo *always* succeeds for judging, correctly highlighting one compliant clause and one severe regulatory violation.
 
 ---
 
@@ -69,4 +70,4 @@ Once both servers are running, go to `http://localhost:3000`.
 
 * **Frontend:** Next.js (App Router), TailwindCSS, TypeScript.
 * **Backend:** FastAPI, Python, PyMuPDF (`fitz`), Pydantic (for strictly typed JSON schemas).
-* **Intelligence:** `GPT-4o` combined with a deterministic, low-temperature prompt enforcing strict Agentic guidelines.
+* **Intelligence:** Google `Gemini 2.5 Flash` combined with a deterministic, low-temperature prompt enforcing strict Agentic guidelines.
