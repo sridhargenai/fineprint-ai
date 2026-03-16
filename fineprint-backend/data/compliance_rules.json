@@ -1,0 +1,34 @@
+{
+    "rules": [
+        {
+            "id": "RBI_FPC_001",
+            "law": "RBI Fair Practices Code",
+            "rule": "Loan agreements must clearly disclose the interest rate and repayment schedule.",
+            "severity": "major"
+        },
+        {
+            "id": "RBI_FPC_002",
+            "law": "RBI Fair Practices Code",
+            "rule": "All fees, charges, and penalties must be transparently disclosed to the borrower.",
+            "severity": "major"
+        },
+        {
+            "id": "RBI_FPC_003",
+            "law": "RBI Fair Practices Code",
+            "rule": "Penalty charges must be reasonable and not excessive.",
+            "severity": "medium"
+        },
+        {
+            "id": "CPA_2019_001",
+            "law": "Consumer Protection Act 2019",
+            "rule": "Contracts must not contain hidden or misleading charges.",
+            "severity": "major"
+        },
+        {
+            "id": "CPA_2019_002",
+            "law": "Consumer Protection Act 2019",
+            "rule": "Contracts must not contain unfair terms that significantly disadvantage the consumer.",
+            "severity": "major"
+        }
+    ]
+}
