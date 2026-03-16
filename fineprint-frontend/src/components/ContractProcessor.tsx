@@ -86,14 +86,18 @@ export function ContractProcessor() {
         }
     }
 
+    const handleExportPDF = () => {
+        window.print()
+    }
+
     return (
         <div className="w-full max-w-5xl mx-auto space-y-8">
             {/* Upload Section */}
             {!result && (
                 <div
                     className={`relative overflow-hidden transition-all duration-300 rounded-3xl border-2 ${isDragging
-                            ? "border-indigo-500 bg-indigo-50 shadow-xl scale-[1.02]"
-                            : "border-dashed border-slate-300 bg-white hover:border-slate-400"
+                        ? "border-indigo-500 bg-indigo-50 shadow-xl scale-[1.02]"
+                        : "border-dashed border-slate-300 bg-white hover:border-slate-400"
                         }`}
                     onDragEnter={handleDrag}
                     onDragLeave={handleDrag}
@@ -212,7 +216,10 @@ export function ContractProcessor() {
                     <div className="flex items-center justify-between border-b border-slate-200 pb-4">
                         <h2 className="text-2xl font-bold text-slate-900">Detailed Audit Log</h2>
                         <div className="flex gap-3">
-                            <button className="text-sm font-semibold text-slate-700 hover:text-indigo-600 bg-white border border-slate-200 px-4 py-2 rounded-xl shadow-sm hover:shadow transition-all">
+                            <button
+                                onClick={handleExportPDF}
+                                className="text-sm font-semibold text-slate-700 hover:text-indigo-600 bg-white border border-slate-200 px-4 py-2 rounded-xl shadow-sm hover:shadow transition-all"
+                            >
                                 Export Audit Report (PDF)
                             </button>
                             <button
