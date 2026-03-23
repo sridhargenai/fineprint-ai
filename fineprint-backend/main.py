@@ -238,6 +238,7 @@ async def upload_contract(file: UploadFile = File(...)):
             if "api_key_missing" in err_msg or "429" in err_msg or "quota" in err_msg:
                 print("\n[WARNING] Gemini Quota Exceeded or API Key Missing. Returning Mock Audit Data.\n")
                 return {
+                    "mode": "demo",
                     "overall_compliance_score": 82,
                     "contract_risk_score": 82,
                     "clauses_analyzed": 14,

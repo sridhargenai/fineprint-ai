@@ -1,73 +1,99 @@
 # FinePrint AI 🕵️‍♂️ (Hackathon Edition)
 
-FinePrint AI is an autonomous **Financial Compliance Agent** designed to automate the auditing of complex loan agreements and vendor contracts.
+FinePrint AI is an autonomous **Financial Compliance Agent** that audits complex 
+loan agreements and vendor contracts against Indian regulatory guardrails — 
+in under 15 seconds.
 
-Instead of human analysts taking 45+ minutes to manually cross-reference 15-page contracts against dense regulatory rulebooks, FinePrint ingests the PDF, extracts the clauses, and uses a deterministic 5-Agent reasoning pipeline (including a dedicated Verification step) to flag violations, cite specific regulatory rules, and suggest compliant rewrites—all in under 15 seconds.
-
-## Built For Evaluators
-This repository was pivoted and built specifically to hit the core evaluation criteria for a domain-specific agent:
-- **Domain Expertise:** Hardcoded to enforce Indian lending/consumer protection rules (e.g., interest rate caps, cooling-off periods).
-- **Compliance Enforcement:** Flags violations and explicitly blocks them.
-- **Auditability:** Every decision output by the agent explicitly requires a `"regulatory_citation"` and verifiable reasoning.
+Instead of human analysts taking 45+ minutes to manually cross-reference 
+15-page contracts against dense regulatory rulebooks, FinePrint ingests the PDF 
+and runs it through a **deterministic 5-Agent reasoning pipeline** that flags 
+violations, verifies them, cites specific regulatory rules, and generates 
+compliant rewrites — with full auditability at every step.
 
 ---
 
-## 🚀 Quick Start Guide
+## 🏆 Built For PS5 — Domain-Specialized AI Agents with Compliance Guardrails
 
-This project is split into two halves: A FastAPI Python Backend and a Next.js React Frontend.
+| PS5 Criteria | How FinePrint Delivers |
+|---|---|
+| **Domain Expertise** | Enforces RBI Fair Practices Code, Consumer Protection Act, SEBI guardrails |
+| **Compliance Enforcement** | Violations are blocked from proceeding without a regulatory citation |
+| **Edge Case Handling** | Verification Agent routes low-confidence flags to `needs_human_review` |
+| **Full Task Completion** | Upload → Audit → Verify → Rewrite → Export in one pipeline |
+| **Auditability** | Every agent decision requires `regulatory_citation` + severity score |
+
+---
+
+## 🤖 The 5-Agent Pipeline
+PDF Upload
+↓
+Parser Agent        — Segments raw text into labelled contract clauses
+↓
+Knowledge Agent     — Injects live RBI / CPA / SEBI regulatory context per clause
+↓
+Compliance Agent    — [LLM Call 1] Audits every clause, flags violations with citations
+↓
+Verification Agent  — [LLM Call 2] Reviews each flag for confidence (HIGH/MEDIUM/LOW)
+LOW confidence → routed to `needs_human_review` (not auto-rewritten)
+↓
+Rewrite Agent       — [LLM Call 3] Generates compliant replacements for verified violations
+↓
+Risk Engine         — Computes weighted severity score (0–100)
+↓
+Audit Report        — Full PDF export with citations, rewrites, and human-review flags
+
+**Stack:** FastAPI · Google Gemini 2.5 Flash · PyMuPDF · Pydantic · Next.js · TailwindCSS
+
+---
+
+## 🚀 Quick Start
 
 ### Prerequisites
 - Python 3.10+
 - Node.js v18+
-- A Google Gemini API Key (Required for the AI Agent)
+- Google Gemini API Key
 
-### 1. Start the Backend Agent (FastAPI)
-1. Navigate to the backend directory:
-   ```bash
-   cd fineprint-backend
-   ```
-2. Install the required Python packages:
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. Create a `.env` file in the root of the backend directory and add your key:
-   ```bash
-   GEMINI_API_KEY=your-api-key-here
-   ```
-4. Run the Python server:
-   ```bash
-   python -m uvicorn main:app --reload
-   ```
-5. *The backend is now running securely on `http://127.0.0.1:8000`*
+### 1. Backend (FastAPI)
 
-### 2. Start the Auditor Dashboard (Next.js)
-1. Open a **new** terminal window.
-2. Navigate to the frontend directory:
-   ```bash
-   cd fineprint-frontend
-   ```
-3. Install the Node dependencies:
-   ```bash
-   npm install
-   ```
-4. Run the development server:
-   ```bash
-   npm run dev
-   ```
-5. *Open your browser to [http://localhost:3000](http://localhost:3000)*
+```bash
+cd fineprint-backend
+pip install -r requirements.txt
+# Create a .env file:
+# GEMINI_API_KEY=your-api-key-here
+python -m uvicorn main:app --reload
+# Running at http://127.0.0.1:8000
+```
+
+### 2. Frontend (Next.js)
+
+```bash
+cd fineprint-frontend
+npm install
+npm run dev
+# Open http://localhost:3000
+```
 
 ---
 
-## 🧪 How to Demo the App
-Once both servers are running, go to `http://localhost:3000`. 
-1. Drag and drop a sample PDF contract (Any PDF will work).
-2. Click **Initiate Audit**.
-3. **Important Note on the Demo:** If you do not have a valid Gemini API key or your quota is exceeded, the application will automatically catch the error (e.g. `api_key_missing` or `429`) and fall back to returning a perfect Mock Audit Data Response. This ensures the demo *always* succeeds for judging, correctly highlighting one compliant clause and one severe regulatory violation.
+## 🧪 Testing the Demo
+A real sample contract is included in the repo:
+`fineprint-backend/Hackathon_Demo_Contract.pdf`
+
+- Drag and drop Hackathon_Demo_Contract.pdf into the dashboard
+- Click Initiate Audit
+- The pipeline runs all 3 LLM calls and returns a full audit report
+
+> **No API key?** If Gemini is unavailable, the system falls back to a pre-computed audit response with the same schema, so the demo UI always renders correctly. A `"mode": "demo"` flag in the response payload identifies this state.
 
 ---
 
-## Architecture
+## 📊 Quantified Impact
 
-* **Frontend:** Next.js (App Router), TailwindCSS, TypeScript.
-* **Backend:** FastAPI, Python, PyMuPDF (`fitz`), Pydantic (for strictly typed JSON schemas).
-* **Intelligence:** Google `Gemini 2.5 Flash` combined with a deterministic, low-temperature prompt enforcing strict Agentic guidelines.
+| Metric | Before | After |
+|---|---|---|
+| Audit time per contract | 45 min | < 15 sec |
+| Annual analyst hours (10K contracts) | 7,500 hrs | 41.6 hrs |
+| Annual labour cost | ₹60,00,000 | ₹40,000 (API cost) |
+| RBI fine exposure | ₹50L+ per violation | Near-zero |
+
+_Assumptions: 10,000 contracts/yr · ₹800/hr analyst cost · ₹4/contract API cost_
