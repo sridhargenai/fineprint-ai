@@ -275,3 +275,21 @@ async def upload_contract(file: UploadFile = File(...)):
     except Exception as e:
         # Catch any unexpected errors (like API keys missing, bad JSON, etc.)
         raise HTTPException(status_code=500, detail=f"Server error: {str(e)}")
+
+@app.post("/refresh-regulations")
+async def refresh_regulations():
+    """
+    Scrapes the RBI Circulars page and dynamically updates the compliance DB 
+    with new inferred rules using Gemini.
+    """
+    from services.regulatory_refresh import run_refresh
+    if not client: # Mock mode check
+        return {"circulars_scanned": 10, "new_rules_added": 0, "added_rule_details": []}
+    
+    try:
+        summary = run_refresh(client)
+        if "error" in summary:
+            raise HTTPException(status_code=503, detail=summary["error"])
+        return summary
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
