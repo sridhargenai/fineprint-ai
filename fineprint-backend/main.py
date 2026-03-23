@@ -80,10 +80,67 @@ class AuditReportResponse(BaseModel):
     details: List[ComplianceCheck]
     contract_risk_score: Optional[int] = None
     violations: Optional[List[OptionalViolation]] = None
+    needs_human_review: Optional[List[OptionalViolation]] = None
 
 # ---------------------------------------------------------
 # API Endpoints
 # ---------------------------------------------------------
+
+def run_verification_agent(violation_list: List[dict], client) -> tuple[List[dict], List[dict]]:
+    """
+    Agent 3.5: Reviews the output of the Compliance Agent.
+    Filters violations by Confidence level to prevent hallucinated rewrites.
+    """
+    if not violation_list or not client:
+        return violation_list, []
+
+    class VerificationItem(BaseModel):
+        clause_text: str
+        confidence: str # "HIGH", "MEDIUM", "LOW"
+        verified: bool
+
+    class VerificationResponse(BaseModel):
+        verifications: List[VerificationItem]
+
+    try:
+        prompt = f"""
+        You are a Senior Legal Verification Agent. Review the flagged compliance violations.
+        Determine your confidence level if the violation is genuinely valid and actionable.
+        Return 'HIGH', 'MEDIUM', or 'LOW' confidence, and a 'verified' boolean.
+        
+        Violations to Verify:
+        {json.dumps(violation_list, indent=2)}
+        """
+
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt,
+            config=genai.types.GenerateContentConfig(
+                temperature=0.1,
+                response_mime_type="application/json",
+                response_schema=VerificationResponse,
+            ),
+        )
+
+        verification_data = json.loads(response.text).get("verifications", [])
+        
+        verified_violations = []
+        needs_human_review = []
+
+        for violation in violation_list:
+            clause = violation.get("clause_text")
+            match = next((v for v in verification_data if v.get("clause_text") == clause), None)
+
+            if match and match.get("verified") and match.get("confidence") in ["HIGH", "MEDIUM"]:
+                verified_violations.append(violation)
+            else:
+                needs_human_review.append(violation)
+
+        return verified_violations, needs_human_review
+
+    except Exception as e:
+        print(f"[WARNING] Verification Agent failed: {e}. Defaulting to verified.")
+        return violation_list, []
 
 @app.post("/upload-contract", response_model=AuditReportResponse)
 async def upload_contract(file: UploadFile = File(...)):
@@ -121,9 +178,12 @@ async def upload_contract(file: UploadFile = File(...)):
             eval_data = evaluate_clauses(clauses, rules_text, client)
             evaluations = eval_data.get("evaluations", [])
             
-            # --- 4. Rewrite Agent ---
+            # --- 3.5 Verification Agent (NEW) ---
             violation_list = [e for e in evaluations if not e.get("is_compliant")]
-            violations_with_rewrites = generate_rewrites(violation_list, client)
+            verified_violations, needs_human_review = run_verification_agent(violation_list, client)
+            
+            # --- 4. Rewrite Agent ---
+            violations_with_rewrites = generate_rewrites(verified_violations, client)
             
             # --- 5. Risk Engine ---
             risk_score = calculate_risk_score(evaluations)
@@ -156,13 +216,21 @@ async def upload_contract(file: UploadFile = File(...)):
                 "suggested_rewrite": str(v.get("suggested_rewrite", "")) if v.get("suggested_rewrite") else None
             } for v in violations_with_rewrites]
 
+            filtered_human_review = [{
+                "clause_text": str(v.get("clause_text", "Unknown Clause")),
+                "violation_reason": str(v.get("violation_reason", "")) if v.get("violation_reason") else None,
+                "regulatory_citation": str(v.get("regulatory_citation", "")) if v.get("regulatory_citation") else None,
+                "suggested_rewrite": None
+            } for v in needs_human_review]
+
             return {
                 "overall_compliance_score": risk_score,
                 "contract_risk_score": risk_score,
                 "clauses_analyzed": len(evaluations),
                 "violations_found": len(violations_with_rewrites),
                 "details": details,
-                "violations": filtered_violations
+                "violations": filtered_violations,
+                "needs_human_review": filtered_human_review
             }
             
         except Exception as api_err:
@@ -197,7 +265,8 @@ async def upload_contract(file: UploadFile = File(...)):
                             "regulatory_citation": "Guardrail 2: Late payment penalties cannot exceed 2% per month.",
                             "suggested_rewrite": "If the borrower misses a payment, a late fee of up to 2% per month will be levied on the overdue installment amount."
                         }
-                    ]
+                    ],
+                    "needs_human_review": []
                 }
             else:
                 raise api_err
