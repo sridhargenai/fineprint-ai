@@ -2,7 +2,7 @@
 
 FinePrint AI is an autonomous **Financial Compliance Agent** designed to automate the auditing of complex loan agreements and vendor contracts.
 
-Instead of human analysts taking 45+ minutes to manually cross-reference 15-page contracts against dense regulatory rulebooks, FinePrint ingests the PDF, extracts the clauses, and uses an Agentic reasoning loop to flag violations, cite specific regulatory rules, and suggest compliant rewrites—all in under 15 seconds.
+Instead of human analysts taking 45+ minutes to manually cross-reference 15-page contracts against dense regulatory rulebooks, FinePrint ingests the PDF, extracts the clauses, and uses a deterministic 5-Agent reasoning pipeline (including a dedicated Verification step) to flag violations, cite specific regulatory rules, and suggest compliant rewrites—all in under 15 seconds.
 
 ## Built For Evaluators
 This repository was pivoted and built specifically to hit the core evaluation criteria for a domain-specific agent:
