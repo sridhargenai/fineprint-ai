@@ -12,17 +12,6 @@ compliant rewrites — with full auditability at every step.
 
 ---
 
-## 🏆 Built For PS5 — Domain-Specialized AI Agents with Compliance Guardrails
-
-| PS5 Criteria | How FinePrint Delivers |
-|---|---|
-| **Domain Expertise** | Enforces RBI Fair Practices Code, Consumer Protection Act, SEBI guardrails |
-| **Edge Case Handling** | Verification Agent routes low-confidence flags to `needs_human_review` |
-| **Live Database Updating** | Regulatory Scraper dynamically updates the local compliance laws via RBI's website |
-| **Auditability** | Every agent decision requires `regulatory_citation` + severity score |
-
----
-
 ## 🤖 The 6-Agent Pipeline
 
 Regulatory Scraper  — Extrapolates new compliance laws from live RBI Circulars and injects into DB
