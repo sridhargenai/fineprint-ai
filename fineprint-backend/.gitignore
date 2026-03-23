@@ -40,3 +40,6 @@ venv.bak/
 # Operating System Files
 .DS_Store
 Thumbs.db
+
+OPENAI_API_KEY
+api.txt
