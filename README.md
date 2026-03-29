@@ -6,7 +6,7 @@ in under 15 seconds.
 
 Instead of human analysts taking 45+ minutes to manually cross-reference 
 15-page contracts against dense regulatory rulebooks, FinePrint ingests the PDF 
-and runs it through a **deterministic 5-Agent reasoning pipeline** that flags 
+and runs it through a **deterministic 6-Agent reasoning pipeline** that flags 
 violations, verifies them, cites specific regulatory rules, and generates 
 compliant rewrites — with full auditability at every step.
 
